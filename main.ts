@@ -16,7 +16,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const PLACARD =
-  "Sticky note, c. 2004. Paper, adhesive, ballpoint ink. Curse tablet of middle management, affixed to the communal fridge and never answered. Bequest of K. Adeyemi.";
+  "Sticky note, c. 2004. Paper, adhesive, ballpoint ink. Curse tablet of middle management, affixed to the communal fridge and ignored for two decades. Bequest of K. Adeyemi.";
 
 function isWritableDir(path) {
   try {
@@ -42,6 +42,12 @@ function main() {
   }
   if (text.includes("\n") || text.includes("\r")) {
     throw new Error("placard must be a single line");
+  }
+  if (Buffer.from(text, "utf8").toString("utf8") !== text) {
+    throw new Error("placard must be valid UTF-8");
+  }
+  if (/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(text)) {
+    throw new Error("placard must not contain control characters");
   }
   const dir = outputDir();
   mkdirSync(dir, { recursive: true });
